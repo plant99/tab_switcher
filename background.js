@@ -12,12 +12,26 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 			var activeTab = tabs[0];
 			chrome.tabs.sendMessage(activeTab.id, {"message":message});
+
+			chrome.tabs.query({currentWindow: true}, function(tabs){
+				let urls = [];
+				tabs.map(tab => {
+					urls.push(tab.url);
+				});
+				chrome.tabs.sendMessage(activeTab.id, {'urls': urls});
+			});
 		})
 		tabSwitcherActivated = true;
-
-	  chrome.tabs.create({"url": "http://google.com"});
 	}else if(message.type === 'close_tab_switcher'){
 		tabSwitcherActivated = false;
+		chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+			var activeTab = tabs[0];
+			chrome.tabs.sendMessage(activeTab.id, {"message":message});
+		})
+	}else if(message.type === 'search_buffer'){
+		if(tabSwitcherActivated){
+			//list matching tabs and show it in popup.html
+		}
 	}
   //send message to active tab
 });
