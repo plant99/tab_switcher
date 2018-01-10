@@ -18,8 +18,12 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		tabSwitcherActivated = false;
 		chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 			var activeTab = tabs[0];
+			chrome.tabs.query({currentWindow: true}, function(tabs){
+				let selectedIndex = Number(message.selectedIndex);
+				chrome.tabs.update(tabs[selectedIndex].id, {active: true});
+			});
 			chrome.tabs.sendMessage(activeTab.id, {"message":message});
-		})
+		});
 	}else if(message.type === 'search_buffer'){
 		if(tabSwitcherActivated){
 			//list matching tabs and show it in popup.html
@@ -35,8 +39,8 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 				chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
 					let activeTab = tabs[0];
 					//alert(activeTab.id);
-					chrome.tabs.sendMessage(activeTab.id, {'indices': indices});
-				})
+					chrome.tabs.sendMessage(activeTab.id, {'indices': indices, titles, urls});
+				});
 			});
 		}
 	}
