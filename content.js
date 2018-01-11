@@ -7,7 +7,7 @@ let keyPressBuffer = new Array(2);
 
 let html = `
 	<div class="popup_tab_switcher">
-		<p>hey there</p>
+		<p class="preview_search_buffer">Your search will appear here</p>
 		<select auto class="select_tab_switcher">
 
 		</select>
@@ -29,6 +29,7 @@ divDummy.innerHTML = html;
 document.body.appendChild(divDummy);
 
 let selectTabSwitcher = document.querySelector('.select_tab_switcher');
+let textPreview = document.querySelector('.preview_search_buffer');
 chrome.runtime.onMessage.addListener(function(request, sender, response){
 	console.log(request);
 	if(request.message === 'clicked_browser_action'){
@@ -36,6 +37,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, response){
 	}
 	if(request.indices){
 		if(request.indices.length){
+			divDummy.style.display = "block";
 			let optionsHtmlString = '';
 			request.indices.map(index => {
 				let option = `<option value=${index}>${request.titles[index]}</option>`;
@@ -43,11 +45,18 @@ chrome.runtime.onMessage.addListener(function(request, sender, response){
 			});
 			selectTabSwitcher.innerHTML = optionsHtmlString;
 			selectTabSwitcher.focus();
+		}else{
+			divDummy.style.display = "none";
 		}
 	}
 });
 window.addEventListener('keydown', function(e){
+	console.log(e.keyCode);
 	if(tabSwitcherInitialized){
+		if(e.keyCode === 8){
+			searchBuffer = searchBuffer.slice(0, searchBuffer.length-1);
+			return;
+		}
 		if((e.keyCode >= 65 && e.keyCode <= 90) || (e.keyCode >= 97 && e.keyCode <= 122) ){
 			searchBuffer += String.fromCharCode(e.keyCode);
 			console.log(searchBuffer);
@@ -59,6 +68,7 @@ window.addEventListener('keydown', function(e){
 	}
 	keyPressBuffer.shift();
 	keyPressBuffer.push(e.keyCode);
+	textPreview.innerHTML = searchBuffer;
 	if(keyPressBuffer[0] === 17 && keyPressBuffer[1] === 192 ){
 		divDummy.style.display = 'block';
 		tabSwitcherInitialized = true;
