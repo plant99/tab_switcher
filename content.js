@@ -55,6 +55,11 @@ window.addEventListener('keydown', function(e){
 	if(tabSwitcherInitialized){
 		if(e.keyCode === 8){
 			searchBuffer = searchBuffer.slice(0, searchBuffer.length-1);
+
+			if(!searchBuffer.length){
+				//divDummy.style.display = 'none';
+				//hide only the  dropdown
+			}
 			return;
 		}
 		if((e.keyCode >= 65 && e.keyCode <= 90) || (e.keyCode >= 97 && e.keyCode <= 122) ){
